@@ -1,3 +1,5 @@
+import { ADMIN_DEFAULT_EMAIL, ADMIN_DEFAULT_PASSWORD } from "../config/adminCredentials";
+
 const STORAGE_KEY = "elite_admin_session";
 
 export type AdminSession = {
@@ -28,8 +30,12 @@ export function isAdminAuthenticated(): boolean {
 }
 
 export function validateAdminCredentials(email: string, password: string): boolean {
-  const expectedEmail = (import.meta.env.VITE_ADMIN_EMAIL ?? "").trim().toLowerCase();
-  const expectedPassword = import.meta.env.VITE_ADMIN_PASSWORD ?? "";
-  if (!expectedEmail || !expectedPassword) return false;
+  const envEmail = import.meta.env.VITE_ADMIN_EMAIL;
+  const envPass = import.meta.env.VITE_ADMIN_PASSWORD;
+  const expectedEmail = (
+    typeof envEmail === "string" && envEmail.trim() !== "" ? envEmail.trim() : ADMIN_DEFAULT_EMAIL
+  ).toLowerCase();
+  const expectedPassword =
+    typeof envPass === "string" && envPass !== "" ? envPass : ADMIN_DEFAULT_PASSWORD;
   return email.trim().toLowerCase() === expectedEmail && password === expectedPassword;
 }

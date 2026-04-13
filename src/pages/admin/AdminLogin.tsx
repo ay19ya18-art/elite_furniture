@@ -19,13 +19,8 @@ export function AdminLoginPage() {
     <div className="flex min-h-dvh items-center justify-center bg-paper px-4">
       <div className="w-full max-w-md rounded-2xl border border-black/5 bg-white p-8 shadow-sm">
         <BrandLogo to="/" />
-        <h1 className="mt-8 font-display text-2xl text-ink">Admin sign in</h1>
-        <p className="mt-2 text-sm text-muted">
-          Use credentials from your environment variables. Copy{" "}
-          <code className="rounded bg-paper px-1">.env.example</code> to <code className="rounded bg-paper px-1">.env</code>{" "}
-          and set <code className="rounded bg-paper px-1">VITE_ADMIN_EMAIL</code> and{" "}
-          <code className="rounded bg-paper px-1">VITE_ADMIN_PASSWORD</code>.
-        </p>
+        <h1 className="mt-8 font-display text-2xl text-ink">تسجيل دخول الأدمن</h1>
+        <p className="mt-2 text-sm text-muted">لوحة تحكم المتجر — أدخل البريد وكلمة المرور.</p>
         <form
           className="mt-8 space-y-5"
           onSubmit={(e) => {
