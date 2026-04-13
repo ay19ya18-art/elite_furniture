@@ -7,7 +7,7 @@ export function CartPage() {
   if (!items.length) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
-        <h1 className="font-display text-3xl text-ink">Your bag is empty</h1>
+        <h1 className="font-display text-3xl text-ink">Your cart is empty</h1>
         <p className="mt-3 text-sm text-muted">Discover pieces curated for real rooms.</p>
         <Link
           to="/shop"
@@ -21,7 +21,7 @@ export function CartPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 lg:px-8">
-      <h1 className="font-display text-3xl text-ink">Bag</h1>
+      <h1 className="font-display text-3xl text-ink">Cart</h1>
       <div className="mt-10 divide-y divide-black/10 border-y border-black/10">
         {items.map((line) => (
           <div key={line.product.id} className="flex flex-col gap-6 py-8 sm:flex-row sm:items-center">
@@ -59,7 +59,7 @@ export function CartPage() {
           onClick={clear}
           className="text-xs font-semibold uppercase tracking-widest text-muted hover:text-ink"
         >
-          Clear bag
+          Clear cart
         </button>
         <div className="text-right">
           <p className="text-xs uppercase tracking-widest text-muted">Subtotal</p>

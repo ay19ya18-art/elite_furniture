@@ -12,6 +12,7 @@ import { CartPage } from "./pages/Cart";
 import { CheckoutPage } from "./pages/Checkout";
 import { WishlistPage } from "./pages/Wishlist";
 import { TrackOrderPage } from "./pages/TrackOrder";
+import { ADMIN_LOGIN_PATH } from "./config/adminRoutes";
 import { SEED_PRODUCTS } from "./data/seedProducts";
 import { seedLocalProductsIfEmpty } from "./services/local/localProducts";
 
@@ -82,8 +83,9 @@ export default function App() {
         <Route path="track-order" element={<TrackOrderPage />} />
       </Route>
 
+      <Route path="/admin/login" element={<Navigate to="/" replace />} />
       <Route
-        path="/admin/login"
+        path={ADMIN_LOGIN_PATH}
         element={
           <Suspense fallback={<AdminFallback />}>
             <AdminLoginPage />

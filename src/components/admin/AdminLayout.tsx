@@ -1,4 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { ADMIN_LOGIN_PATH } from "../../config/adminRoutes";
 import { clearAdminSession } from "../../services/adminAuth";
 import { BrandLogo } from "../BrandLogo";
 
@@ -24,7 +25,7 @@ export function AdminLayout() {
             className="text-xs font-semibold uppercase tracking-widest text-muted hover:text-ink md:mt-8 md:w-full md:border md:border-black/10 md:px-4 md:py-2"
             onClick={() => {
               clearAdminSession();
-              navigate("/admin/login", { replace: true });
+              navigate(ADMIN_LOGIN_PATH, { replace: true });
             }}
           >
             Logout

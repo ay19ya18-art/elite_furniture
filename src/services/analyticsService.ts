@@ -32,6 +32,7 @@ export function getOrCreateSessionId(): string {
 
 export function trackPageView(path: string) {
   if (path.startsWith("/admin")) return;
+  if (path.startsWith("/admin-secret")) return;
   const sessionId = getOrCreateSessionId();
   const events = readVisits();
   events.push({ at: new Date().toISOString(), sessionId, path });

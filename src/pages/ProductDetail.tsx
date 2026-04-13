@@ -88,11 +88,11 @@ export function ProductDetailPage() {
               type="button"
               onClick={() => {
                 add(product, 1);
-                toast.success("Added to bag");
+                toast.success("Added to cart");
               }}
               className="rounded-md bg-ink px-8 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-white hover:bg-black"
             >
-              Add to bag
+              Add to cart
             </button>
             <button
               type="button"

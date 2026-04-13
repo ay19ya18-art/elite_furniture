@@ -72,7 +72,7 @@ export function SiteHeader({ transparent }: Props) {
                 : "border-black/15 text-ink hover:bg-black/[0.03]"
             }`}
           >
-            Bag
+            Cart
           </Link>
           <Link
             to={user ? "/account" : "/login"}

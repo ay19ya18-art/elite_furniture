@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { findRegisteredByEmail, registerCustomer } from "../services/local/registeredCustomers";
 
 export type CustomerUser = {
   email: string;
@@ -7,9 +8,12 @@ export type CustomerUser = {
   provider: "google" | "password";
 };
 
+type SignUpResult = { ok: true } | { ok: false; error: string };
+
 type Value = {
   user: CustomerUser | null;
   signInPassword: (email: string, password: string) => boolean;
+  signUp: (name: string, email: string, password: string) => SignUpResult;
   signInGoogle: (user: CustomerUser) => void;
   signOut: () => void;
 };
@@ -27,6 +31,11 @@ function load(): CustomerUser | null {
   }
 }
 
+function persistUser(u: CustomerUser | null) {
+  if (u) localStorage.setItem(KEY, JSON.stringify(u));
+  else localStorage.removeItem(KEY);
+}
+
 export function CustomerAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<CustomerUser | null>(() => load());
 
@@ -34,25 +43,36 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user,
       signInPassword: (email, password) => {
-        const e = email.trim().toLowerCase();
-        const p = password.trim();
-        if (!e || !p) return false;
-        // Demo accounts — replace with API later
-        if (e === "demo@elitefurniture.com" && p === "demo1234") {
-          const u: CustomerUser = { email: e, name: "Demo Customer", provider: "password" };
-          setUser(u);
-          localStorage.setItem(KEY, JSON.stringify(u));
-          return true;
-        }
-        return false;
+        const row = findRegisteredByEmail(email);
+        if (!row || row.password !== password) return false;
+        const u: CustomerUser = {
+          email: row.email,
+          name: row.name,
+          provider: "password",
+        };
+        setUser(u);
+        persistUser(u);
+        return true;
+      },
+      signUp: (name, email, password) => {
+        const res = registerCustomer(name, email, password);
+        if (!res.ok) return { ok: false, error: res.error };
+        const u: CustomerUser = {
+          email: res.customer.email,
+          name: res.customer.name,
+          provider: "password",
+        };
+        setUser(u);
+        persistUser(u);
+        return { ok: true };
       },
       signInGoogle: (u) => {
         setUser(u);
-        localStorage.setItem(KEY, JSON.stringify(u));
+        persistUser(u);
       },
       signOut: () => {
         setUser(null);
-        localStorage.removeItem(KEY);
+        persistUser(null);
       },
     }),
     [user],

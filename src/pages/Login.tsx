@@ -9,13 +9,18 @@ import { useCustomerAuth } from "../context/CustomerAuthContext";
 const sideImage =
   "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1600&q=80";
 
+type Mode = "signin" | "signup";
+
 export function LoginPage() {
   const navigate = useNavigate();
-  const { signInPassword } = useCustomerAuth();
+  const { signInPassword, signUp } = useCustomerAuth();
+  const googleConfigured = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
+
+  const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const googleConfigured = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
+  const [confirm, setConfirm] = useState("");
+  const [name, setName] = useState("");
 
   return (
     <div className="relative flex min-h-dvh flex-col bg-white">
@@ -38,80 +43,147 @@ export function LoginPage() {
       </header>
       <div className="relative z-[1] mx-auto grid min-h-0 flex-1 max-w-6xl md:grid-cols-2">
         <div className="flex flex-col justify-center px-6 py-16 sm:px-12 lg:px-16">
-          <h1 className="font-display text-4xl text-ink">Welcome back</h1>
+          <h1 className="font-display text-4xl text-ink">
+            {mode === "signin" ? "Welcome back" : "Create your account"}
+          </h1>
           <p className="mt-3 text-sm text-muted">
-            Sign in to access your wishlist, orders, and more.
+            {mode === "signin"
+              ? "Sign in with email or Google — wishlist, orders, and more."
+              : "Register with email and password (stored on this device until you connect a backend)."}
           </p>
 
-          <form
-            className="mt-10 space-y-6"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (signInPassword(email, password)) {
-                toast.success("Signed in");
-                navigate("/account");
-              } else {
-                toast.error("Invalid email or password.");
-              }
-            }}
-          >
-            <div>
-              <label className="text-[10px] font-semibold uppercase tracking-[0.28em] text-muted">
-                Email address
-              </label>
-              <input
-                className="mt-2 w-full rounded-md border border-black/15 px-4 py-3 text-sm outline-none focus:border-ink"
-                type="email"
-                autoComplete="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="text-[10px] font-semibold uppercase tracking-[0.28em] text-muted">
-                Password
-              </label>
-              <input
-                className="mt-2 w-full rounded-md border border-black/15 px-4 py-3 text-sm outline-none focus:border-ink"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <div className="text-right">
-              <span className="text-xs text-muted">Forgot password?</span>
-            </div>
+          <div className="mt-6 flex rounded-lg border border-black/10 bg-paper p-1 text-xs font-semibold uppercase tracking-widest">
             <button
-              type="submit"
-              className="w-full rounded-md bg-ink py-3 text-xs font-semibold uppercase tracking-[0.22em] text-white hover:bg-black"
+              type="button"
+              className={`flex-1 rounded-md py-2 transition ${
+                mode === "signin" ? "bg-ink text-white" : "text-muted hover:text-ink"
+              }`}
+              onClick={() => setMode("signin")}
             >
               Sign in
             </button>
-          </form>
+            <button
+              type="button"
+              className={`flex-1 rounded-md py-2 transition ${
+                mode === "signup" ? "bg-ink text-white" : "text-muted hover:text-ink"
+              }`}
+              onClick={() => setMode("signup")}
+            >
+              Register
+            </button>
+          </div>
+
+          {mode === "signup" ? (
+            <form
+              className="mt-8 space-y-5"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (password !== confirm) {
+                  toast.error("Passwords do not match.");
+                  return;
+                }
+                const res = signUp(name, email, password);
+                if (!res.ok) {
+                  toast.error(res.error);
+                  return;
+                }
+                toast.success("Account created — you're signed in.");
+                navigate("/account");
+              }}
+            >
+              <Field
+                label="Full name"
+                value={name}
+                onChange={setName}
+                autoComplete="name"
+                placeholder="Your name"
+              />
+              <Field
+                label="Email"
+                type="email"
+                required
+                value={email}
+                onChange={setEmail}
+                autoComplete="email"
+              />
+              <Field
+                label="Password (min 8 characters)"
+                type="password"
+                required
+                value={password}
+                onChange={setPassword}
+                autoComplete="new-password"
+              />
+              <Field
+                label="Confirm password"
+                type="password"
+                required
+                value={confirm}
+                onChange={setConfirm}
+                autoComplete="new-password"
+              />
+              <button
+                type="submit"
+                className="w-full rounded-md bg-ink py-3 text-xs font-semibold uppercase tracking-[0.22em] text-white hover:bg-black"
+              >
+                Create account
+              </button>
+            </form>
+          ) : (
+            <form
+              className="mt-8 space-y-5"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (signInPassword(email, password)) {
+                  toast.success("Signed in");
+                  navigate("/account");
+                } else {
+                  toast.error("Invalid email or password. Create an account if you're new.");
+                }
+              }}
+            >
+              <Field
+                label="Email"
+                type="email"
+                required
+                value={email}
+                onChange={setEmail}
+                autoComplete="email"
+              />
+              <Field
+                label="Password"
+                type="password"
+                required
+                value={password}
+                onChange={setPassword}
+                autoComplete="current-password"
+              />
+              <button
+                type="submit"
+                className="w-full rounded-md bg-ink py-3 text-xs font-semibold uppercase tracking-[0.22em] text-white hover:bg-black"
+              >
+                Sign in
+              </button>
+            </form>
+          )}
+
+          <div className="relative my-10">
+            <div className="absolute inset-0 flex items-center" aria-hidden>
+              <div className="w-full border-t border-black/10" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase tracking-widest text-muted">
+              <span className="bg-white px-3">Or continue with</span>
+            </div>
+          </div>
 
           {googleConfigured ? (
             <GoogleSignInButton />
           ) : (
-            <p className="mt-6 text-xs text-muted">
-              Google sign-in: add <code className="rounded bg-paper px-1">VITE_GOOGLE_CLIENT_ID</code>{" "}
-              in <code className="rounded bg-paper px-1">.env</code>.
+            <p className="text-sm text-muted">
+              Google: add <code className="rounded bg-paper px-1">VITE_GOOGLE_CLIENT_ID</code> in{" "}
+              <code className="rounded bg-paper px-1">.env</code>.
             </p>
           )}
-
-          <p className="mt-10 text-sm text-muted">
-            Demo account:{" "}
-            <span className="text-ink">
-              demo@elitefurniture.com / demo1234
-            </span>
-          </p>
-          <p className="mt-6 text-sm text-muted">
-            Staff?{" "}
-            <Link className="text-ink underline" to="/admin/login">
-              Admin login
-            </Link>
-          </p>
         </div>
         <div className="relative hidden min-h-dvh md:block">
           <img src={sideImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
@@ -127,6 +199,39 @@ export function LoginPage() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function Field({
+  label,
+  value,
+  onChange,
+  type = "text",
+  required,
+  placeholder,
+  autoComplete,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+  required?: boolean;
+  placeholder?: string;
+  autoComplete?: string;
+}) {
+  return (
+    <div>
+      <label className="text-[10px] font-semibold uppercase tracking-[0.28em] text-muted">{label}</label>
+      <input
+        required={required}
+        type={type}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        className="mt-2 w-full rounded-md border border-black/15 px-4 py-3 text-sm outline-none focus:border-ink"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
     </div>
   );
 }
